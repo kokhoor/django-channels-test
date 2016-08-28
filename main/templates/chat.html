@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="container">
+<div class="page-header">
+  <h1>Chat</h1> <a class="btn btn-primary" href="/" role="button">Home</a>
+</div>
+
+<table id="chat" class="table table-striped table-bordered">
+  <tr>
+    <th nowrap="nowrap">Timestamp</th>
+    <th nowrap="nowrap">From</th>
+    <th width="100%">Message</th>
+  </tr>
+{% for chat in chats %}
+  <tr>
+    <td nowrap="nowrap">{{ chat.timestamp }}</td>
+    <td nowrap="nowrap">{{ chat.handle }}</td>
+    <td width="100%">{{ chat.message }}</td>
+  </tr>
+{% endfor %}
+</table>
+
+<form id="chatform">
+<div class="form-group">
+  <input class="form-control" type="text" id="handle" value="" placeholder="Your nick">
+</div>
+<div class="form-group">
+  <textarea class="form-control" rows="3" id="message" placeholder="Please enter your message"></textarea>
+</div>
+  <button type="button" id="btnSubmit" class="btn btn-success">Submit</button>
+</form>
+
+<br/>
+Like us? Invite your friends to attend PyCon MY 2017! Click <a href="/invite">here</a>
+</div>
+<script src="/static/js/jquery-1.12.2.min.js"></script>
+<script src="/static/js/jquery-ui.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/reconnecting-websocket.min.js"></script>
+<script>
+$(function() {
+    // When we're using HTTPS, use WSS too.
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    var url = ws_scheme + '://' + window.location.hostname + ":{{ CHAT_PORT }}" + window.location.pathname;
+    console.log(url);
+    var chatsock = new ReconnectingWebSocket(url);
+    
+    chatsock.onmessage = function(message) {
+        var data = JSON.parse(message.data);
+        var chat = $("#chat");
+        var ele = $('<tr class="success"></tr>');
+        var e1 = $('<td nowrap="nowrap"></td>').text(data.timestamp);
+        var e2 = $('<td nowrap="nowrap"></td>').text(data.handle);
+        var e3 = $('<td width="100%"></td>').text(data.message);
+        ele.append(e1);
+        ele.append(e2);
+        ele.append(e3);
+        chat.append(ele);
+        e1.animate({ backgroundColor: "white" }, 3000);
+        e2.animate({ backgroundColor: "white" }, 3000);
+        e3.animate({ backgroundColor: "white" }, 3000);
+    };
+
+    $("#btnSubmit").on("click", function(event) {
+        var message = {
+            handle: $('#handle').val(),
+            message: $('#message').val(),
+        }
+        chatsock.send(JSON.stringify(message));
+        $("#message").val('').focus();
+        return false;
+    });
+});
+</script>
+</body>
+</html>

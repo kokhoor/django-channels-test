@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Invite your friend to PyConMY 2017!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="container">
+<div class="page-header">
+  <h1>Email Invitation</h1> <a class="btn btn-primary" href="/" role="button">Home</a>
+</div>
+{% if message %}
+<div class="alert alert-success" role="alert">{{ message }}</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-danger" role="alert">{{ error }}</div>
+{% endif %}
+<form method="post">
+  {% csrf_token %}
+<div class="form-group">
+<label for="email">Email address</label>
+<input type="email" class="form-control" id="email" name="email">
+</div>
+<button type="submit" class="btn btn-default">Submit</button>
+</form>
+</div>
+<script src="/static/js/jquery-1.12.2.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+</body>
+</html>
