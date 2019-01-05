@@ -3,7 +3,7 @@ asgiref==0.14.0
 autobahn==0.16.0
 channels==0.17.2
 daphne==0.14.3
-Django==1.10
+Django>=1.10.8
 msgpack-python==0.4.8
 redis==2.10.5
 six==1.10.0
