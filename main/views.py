@@ -1,10 +1,12 @@
-from channels import Channel
+from asgiref.sync import async_to_sync
+
+import channels.layers
 
 from django.conf import settings
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-import models
+from . import models
 
 
 class IndexView(TemplateView):
@@ -28,10 +30,12 @@ class InviteView(TemplateView):
             return super(TemplateView, self).render_to_response(context)
 
         data = {
+            'type': 'send_invite',
             'email': email,
-            'message': u"Hi, %s, you're invited!! Check us out at http://www.solutionx.com.my for more info!" % email
+            'message': "Hi, %s, you're invited!! Check us out at http://www.solutionx.com.my for more info!" % email
         }
-        Channel('send-invite', alias=settings.BATCH_CHANNEL_LAYER).send(data)
+        channel_layer = channels.layers.get_channel_layer(settings.BATCH_CHANNEL_LAYER)
+        async_to_sync(channel_layer.send)('send-email', data)
         context['message'] = "We're sending the invite for you!"
         return super(TemplateView, self).render_to_response(context)
 
@@ -41,7 +45,7 @@ class ChatView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ChatView, self).get_context_data(**kwargs)
-        prefix, label = self.request.path_info.strip('/').split('/')
+        label = kwargs['room_name']
         try:
             chats = reversed(list(models.Room.objects.get(label=label).messages.only('handle', 'message', 'timestamp').order_by("-id")[:5]))
             context['chats'] = chats

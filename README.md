@@ -32,10 +32,9 @@ How To:
 
     ```
     $ redis-server
+    $ python manage.py runserver
+    $ python manage.py runworker send-email
 
-    $ daphne -b 0.0.0.0 main.asgi:channel_layer
-
-    $ python manage.py runworker
     ```
 
     You can add additional workers (as many as you like)
@@ -49,22 +48,23 @@ How To:
 	$ redis-server
 	$ redis-server --port 7777
 	
-	$ daphne -b 0.0.0.0 main.asgi_sharding:channel_layer
+	$ daphne -b 0.0.0.0 -p 8000 main.asgi_sharding:application
 	
-	$ python manage.py runworker --settings channels_test.settings_sharding
-	$ python manage.py runworker --settings channels_test.settings_sharding
+	$ python manage.py runworker --settings channels_test.settings_sharding send-email
+	$ python manage.py runworker --settings channels_test.settings_sharding send-email
 	```
 
 6. To run the multiple channels layer example ('test' layer and 'chat' layer) - refer to channels_test/settings_prod.py)
 
+   The running of two daphne no longer so helpful now because I believe websocket now linked to daphne instance,
+   so it seems both port 8000 and 8080 will host the http and websocket.
 	```
 	$ redis-server
 	$ redis-server --port 7777
 	
-	$ daphne -b 0.0.0.0 -p 8000 main.asgi_test:channel_layer
-	$ python manage.py runworker --settings channels_test.settings_prod --layer test --only-channels http.request
-	$ python manage.py runworker --settings channels_test.settings_prod --layer test --only-channels send-invite
+	$ daphne -b 0.0.0.0 -p 8000 main.asgi_test:application
+	$ python manage.py runworker --settings channels_test.settings_prod --layer test send-email
+	$ python manage.py runworker --settings channels_test.settings_prod --layer test send-email
 	
-	$ daphne -b 0.0.0.0 -p 8080 main.asgi_chat:channel_layer
-	$ python manage.py runworker --settings channels_test.settings_prod --layer chat
+	$ daphne -b 0.0.0.0 -p 8080 main.asgi_chat:application
 	```

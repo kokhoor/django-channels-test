@@ -123,15 +123,16 @@ STATIC_URL = '/static/'
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": ['redis://localhost:6379', 'redis://localhost:7777'],
-        },
-        "ROUTING": "main.routing.default_routing",
+        }
     }
 }
+ASGI_APPLICATION = "main.routing.application"
 
 BATCH_CHANNEL_LAYER = 'default'
+CHAT_CHANNEL_LAYER = 'default'
 CHAT_PORT = 8000
 
 # Logging

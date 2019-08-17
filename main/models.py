@@ -14,7 +14,7 @@ class Room(models.Model):
         return self.label
 
 class Message(models.Model):
-    room = models.ForeignKey(Room, related_name='messages')
+    room = models.ForeignKey(Room, related_name='messages', on_delete=models.PROTECT)
     handle = models.TextField()
     message = models.TextField()
     timestamp = models.DateTimeField(default=datetime.datetime.now, db_index=True)
@@ -27,4 +27,8 @@ class Message(models.Model):
         return self.timestamp.strftime('%b %-d %-I:%M %p')
     
     def as_dict(self):
-        return {'handle': self.handle, 'message': self.message, 'timestamp': self.formatted_timestamp}
+        return {
+            'handle': self.handle,
+            'message': self.message,
+            'timestamp': self.formatted_timestamp
+        }

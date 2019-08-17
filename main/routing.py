@@ -1,6 +1,24 @@
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ChannelNameRouter, ProtocolTypeRouter, URLRouter
+
+from django.urls import path
+
+from . import batch, consumers
+
+
+application = ProtocolTypeRouter({
+    # Empty for now (http->django views is added by default)
+    "websocket": AuthMiddlewareStack(
+        URLRouter([
+        	path('chat/<str:room_name>', consumers.ChatConsumer),
+        ])
+    ),
+    "channel": ChannelNameRouter({
+        "send-email": batch.SendEmailConsumer,
+    }),
+})
+"""
 from channels.routing import route
-from . import consumers
-from . import batch
 
 
 channel_routing = [
@@ -16,3 +34,4 @@ chat_routing = [
 
 
 default_routing = channel_routing + chat_routing
+"""

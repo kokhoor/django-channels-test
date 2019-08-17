@@ -71,7 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'channels_test.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
@@ -123,14 +122,15 @@ STATIC_URL = '/static/'
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
-        },
-        "ROUTING": "main.routing.default_routing",
+            "hosts": ['redis://localhost:6379'],
+        }
     }
 }
+ASGI_APPLICATION = "main.routing.application"
 
+CHAT_CHANNEL_LAYER = 'default'
 BATCH_CHANNEL_LAYER = 'default'
 CHAT_PORT = 8000
 
