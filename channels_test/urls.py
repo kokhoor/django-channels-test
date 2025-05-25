@@ -18,9 +18,18 @@ from django.contrib import admin
 
 from main import views as main_views
 
+# urlpatterns = [
+#     path('', main_views.IndexView.as_view()),
+#     path('invite', main_views.InviteView.as_view()),
+#     path('chat/<str:room_name>', main_views.ChatView.as_view()),
+#     path('admin/', admin.site.urls),
+# ]
+
+# app_name = 'main' # Ensure this is commented out or removed
+
 urlpatterns = [
-    path('', main_views.IndexView.as_view()),
-    path('invite', main_views.InviteView.as_view()),
-    path('chat/<str:room_name>', main_views.ChatView.as_view()),
+    path('', main_views.IndexView.as_view(), name='main_index'),
+    path('invite', main_views.InviteView.as_view(), name='main_invite'),
+    path('chat/<str:room_name>', main_views.ChatView.as_view(), name='main_chat'),
     path('admin/', admin.site.urls),
 ]
