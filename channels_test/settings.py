@@ -71,6 +71,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'channels_test.wsgi.application'
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
