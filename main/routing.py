@@ -6,32 +6,15 @@ from django.urls import path
 from . import batch, consumers
 
 
+websocket_urlpatterns = [
+    path('chat/<str:room_name>', consumers.ChatConsumer.as_asgi()),
+]
+
 application = ProtocolTypeRouter({
-    # Empty for now (http->django views is added by default)
     "websocket": AuthMiddlewareStack(
-        URLRouter([
-        	path('chat/<str:room_name>', consumers.ChatConsumer),
-        ])
+        URLRouter(websocket_urlpatterns)
     ),
     "channel": ChannelNameRouter({
-        "send-email": batch.SendEmailConsumer,
+        "send-email": batch.SendEmailConsumer.as_asgi(),
     }),
 })
-"""
-from channels.routing import route
-
-
-channel_routing = [
-    route('send-invite', batch.send_invite),
-]
-
-
-chat_routing = [
-    route('websocket.connect', consumers.ws_connect),
-    route('websocket.receive', consumers.ws_receive),
-    route('websocket.disconnect', consumers.ws_disconnect),
-]
-
-
-default_routing = channel_routing + chat_routing
-"""

@@ -26,7 +26,7 @@ class RoomModelTests(TestCase):
 
     def test_room_unicode(self):
         room = Room.objects.create(name="Another Room", label="another-room")
-        self.assertEqual(room.__unicode__(), "another-room")
+        self.assertEqual(str(room), "another-room")
 
 class MessageModelTests(TestCase):
     @classmethod
@@ -59,7 +59,7 @@ class MessageModelTests(TestCase):
         test_timestamp = datetime.datetime(2023, 12, 1, 8, 0, 0)
         message = Message.objects.create(room=self.room, handle="UniUser", message="Unicode test message", timestamp=test_timestamp)
         expected_unicode = "[Dec 1 8:00 AM] UniUser: Unicode test message"
-        self.assertEqual(message.__unicode__(), expected_unicode)
+        self.assertEqual(str(message), expected_unicode)
 
 # View Tests (Copied from existing, assumed URL names are fixed and non-namespaced)
 class IndexViewTests(TestCase):
@@ -163,21 +163,21 @@ class ChatConsumerTests(TestCase): # Inherits from TestCase
         return await _last_msg()
 
     async def test_consumer_connect_existing_room(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/ws/chat/{self.room.label}/")
+        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/chat/{self.room.label}")
         communicator.scope['url_route'] = {'kwargs': {'room_name': self.room.label}}
         connected, _ = await communicator.connect()
         self.assertTrue(connected)
         await communicator.disconnect()
 
     async def test_consumer_connect_non_existing_room(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), "/ws/chat/non-existent-room/")
+        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), "/chat/non-existent-room")
         communicator.scope['url_route'] = {'kwargs': {'room_name': 'non-existent-room'}}
         connected, _ = await communicator.connect()
         self.assertFalse(connected, "Consumer should not connect if room does not exist.")
         # No disconnect needed if connection failed as expected
 
     async def test_consumer_receive_valid_message(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/ws/chat/{self.room.label}/")
+        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/chat/{self.room.label}")
         communicator.scope['url_route'] = {'kwargs': {'room_name': self.room.label}}
         await communicator.connect()
         initial_message_count = await self.get_message_count(self.room)
@@ -193,7 +193,7 @@ class ChatConsumerTests(TestCase): # Inherits from TestCase
 
     async def test_consumer_receive_message_non_existing_room_label_in_scope(self):
         room_label_non_existent = "room-does-not-exist-for-receive"
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/ws/chat/{room_label_non_existent}/")
+        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/chat/{room_label_non_existent}")
         communicator.scope['url_route'] = {'kwargs': {'room_name': room_label_non_existent}}
         
         # Consumer's connect now closes if room DNE, so this connection should fail.
@@ -243,7 +243,9 @@ class ChatConsumerTests(TestCase): # Inherits from TestCase
         #    await communicator.disconnect()
 
     async def test_consumer_receive_invalid_data_format(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/ws/chat/{self.room.label}/")
+        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/chat/{self.room.label}")
+        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/chat/{self.room.label}")
+        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/chat/{self.room.label}")
         communicator.scope['url_route'] = {'kwargs': {'room_name': self.room.label}}
         connected, _ = await communicator.connect() # Ensure connection for this test
         self.assertTrue(connected, "Failed to connect for invalid data format test.")
@@ -286,7 +288,7 @@ class ChatConsumerTests(TestCase): # Inherits from TestCase
         await communicator.disconnect() # Disconnect the last communicator
 
     async def test_consumer_disconnect(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/ws/chat/{self.room.label}/")
+        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), f"/chat/{self.room.label}")
         communicator.scope['url_route'] = {'kwargs': {'room_name': self.room.label}}
         await communicator.connect()
         await communicator.disconnect()
