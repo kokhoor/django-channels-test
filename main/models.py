@@ -10,7 +10,7 @@ class Room(models.Model):
     name = models.TextField()
     label = models.SlugField(unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
 class Message(models.Model):
@@ -19,7 +19,7 @@ class Message(models.Model):
     message = models.TextField()
     timestamp = models.DateTimeField(default=datetime.datetime.now, db_index=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '[{timestamp}] {handle}: {message}'.format(**self.as_dict())
 
     @property

@@ -47,9 +47,10 @@ class ChatView(TemplateView):
         context = super(ChatView, self).get_context_data(**kwargs)
         label = kwargs['room_name']
         try:
-            chats = reversed(list(models.Room.objects.get(label=label).messages.only('handle', 'message', 'timestamp', 'room_id').order_by("-timestamp")[:5]))
-            context['chats'] = chats
+            room = models.Room.objects.get(label=label)
+            chats_list = list(room.messages.only('handle', 'message', 'timestamp', 'room_id').order_by("-timestamp")[:5])
+            context['chats'] = list(reversed(chats_list))
         except Exception as e:
-	        raise e;
+            raise e
         context['CHAT_PORT'] = settings.CHAT_PORT
         return context
